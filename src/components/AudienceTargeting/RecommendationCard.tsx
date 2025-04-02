@@ -73,13 +73,23 @@ const RecommendationCard = ({ audience }: RecommendationCardProps) => {
               <span className="text-gray-500">Conversion Potential</span>
               <span className="font-medium">{audience.conversionPotential}%</span>
             </div>
-            <Progress value={audience.conversionPotential} className="h-1.5" indicatorClassName={getScoreColor(audience.conversionPotential)} />
+            <div className="relative w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`absolute top-0 left-0 h-full ${getScoreColor(audience.conversionPotential)}`} 
+                style={{ width: `${audience.conversionPotential}%` }}
+              />
+            </div>
             
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-500">Cost Efficiency</span>
               <span className="font-medium">{audience.costEfficiency}%</span>
             </div>
-            <Progress value={audience.costEfficiency} className="h-1.5" indicatorClassName={getScoreColor(audience.costEfficiency)} />
+            <div className="relative w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`absolute top-0 left-0 h-full ${getScoreColor(audience.costEfficiency)}`} 
+                style={{ width: `${audience.costEfficiency}%` }}
+              />
+            </div>
           </div>
           
           <div className="pt-2 text-xs">

@@ -25,28 +25,29 @@ interface AudienceChartProps {
 const AudienceChart = ({ audiences }: AudienceChartProps) => {
   const [chartType, setChartType] = useState("radar");
   
-  const radarData = audiences.map(audience => ({
-    subject: audience.name,
+  // Transform data for radar chart
+  const radarChartData = audiences.map((audience) => ({
+    name: audience.name,
     "Match Rate": audience.matchRate,
     "Conversion Potential": audience.conversionPotential,
     "Cost Efficiency": audience.costEfficiency,
   }));
   
-  const barData = [
-    { name: "Match Rate", ...audiences.reduce((obj, audience) => ({ ...obj, [audience.name]: audience.matchRate }), {}) },
-    { name: "Conversion Potential", ...audiences.reduce((obj, audience) => ({ ...obj, [audience.name]: audience.conversionPotential }), {}) },
-    { name: "Cost Efficiency", ...audiences.reduce((obj, audience) => ({ ...obj, [audience.name]: audience.costEfficiency }), {}) },
-  ];
-  
-  const reachData = audiences.map(audience => ({
-    name: audience.name,
-    value: audience.reachSize,
-  }));
+  // Prepare data for bar chart
+  const metrics = ["Match Rate", "Conversion Potential", "Cost Efficiency"];
+  const barChartData = metrics.map(metric => {
+    const dataPoint: Record<string, any> = { name: metric };
+    audiences.forEach(audience => {
+      const value = audience[metric.toLowerCase().replace(" ", "") as keyof typeof audience];
+      dataPoint[audience.name] = value;
+    });
+    return dataPoint;
+  });
   
   const colors = ["#0575E6", "#64748b", "#94a3b8"];
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <Tabs defaultValue="radar" value={chartType} onValueChange={setChartType} className="mb-4">
         <TabsList className="grid grid-cols-2 w-64">
           <TabsTrigger value="radar">Radar View</TabsTrigger>
@@ -54,31 +55,31 @@ const AudienceChart = ({ audiences }: AudienceChartProps) => {
         </TabsList>
       </Tabs>
       
-      <div className="h-80">
+      <div className="flex-1">
         <TabsContent value="radar" className="h-full">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={audiences}>
+            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarChartData}>
               <PolarGrid />
               <PolarAngleAxis dataKey="name" />
               <PolarRadiusAxis angle={30} domain={[0, 100]} />
               
               <Radar 
                 name="Match Rate" 
-                dataKey="matchRate" 
+                dataKey="Match Rate" 
                 stroke={colors[0]} 
                 fill={colors[0]} 
                 fillOpacity={0.3} 
               />
               <Radar 
                 name="Conversion Potential" 
-                dataKey="conversionPotential" 
+                dataKey="Conversion Potential" 
                 stroke={colors[1]} 
                 fill={colors[1]} 
                 fillOpacity={0.3} 
               />
               <Radar 
                 name="Cost Efficiency" 
-                dataKey="costEfficiency" 
+                dataKey="Cost Efficiency" 
                 stroke={colors[2]} 
                 fill={colors[2]} 
                 fillOpacity={0.3}
@@ -91,7 +92,7 @@ const AudienceChart = ({ audiences }: AudienceChartProps) => {
         
         <TabsContent value="bar" className="h-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barData}>
+            <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis domain={[0, 100]} />

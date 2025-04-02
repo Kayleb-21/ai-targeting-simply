@@ -1,4 +1,3 @@
-
 import AudienceChart from "./AudienceChart";
 import RecommendationCard from "./RecommendationCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Share2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type Audience = {
   id: number;
@@ -24,10 +24,23 @@ type Audience = {
 
 interface AudienceInsightsProps {
   audiences: Audience[];
+  onApplyAudiences?: () => void;
 }
 
-const AudienceInsights = ({ audiences }: AudienceInsightsProps) => {
+const AudienceInsights = ({ audiences, onApplyAudiences }: AudienceInsightsProps) => {
   const totalReach = audiences.reduce((sum, audience) => sum + audience.reachSize, 0);
+  const { toast } = useToast();
+  
+  const handleApplyAudiences = () => {
+    if (onApplyAudiences) {
+      onApplyAudiences();
+    }
+    
+    toast({
+      title: "Audience segments applied",
+      description: "Your campaign is now optimized with the selected audience segments.",
+    });
+  };
   
   return (
     <div className="space-y-6">
@@ -81,14 +94,14 @@ const AudienceInsights = ({ audiences }: AudienceInsightsProps) => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Audience Segment Comparison</CardTitle>
               <CardDescription>
                 Analysis of your recommended audience segments across key performance metrics.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="h-[400px]">
               <AudienceChart audiences={audiences} />
             </CardContent>
           </Card>
@@ -171,7 +184,10 @@ const AudienceInsights = ({ audiences }: AudienceInsightsProps) => {
       </Card>
       
       <div className="flex justify-center">
-        <Button className="bg-gradient-to-r from-brand-blue to-brand-teal hover:from-brand-blue/90 hover:to-brand-teal/90">
+        <Button 
+          className="bg-gradient-to-r from-brand-blue to-brand-teal hover:from-brand-blue/90 hover:to-brand-teal/90"
+          onClick={handleApplyAudiences}
+        >
           Apply These Audience Segments
         </Button>
       </div>

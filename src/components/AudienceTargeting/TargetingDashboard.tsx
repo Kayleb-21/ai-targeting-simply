@@ -25,6 +25,7 @@ const TargetingDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [activeTab, setActiveTab] = useState("targeting");
+  const [hasAppliedAudiences, setHasAppliedAudiences] = useState(false);
 
   const handleFormSubmit = (formData: any) => {
     setIsLoading(true);
@@ -36,6 +37,11 @@ const TargetingDashboard = () => {
       setIsLoading(false);
       setActiveTab("insights");
     }, 2000);
+  };
+  
+  const handleApplyAudiences = () => {
+    setActiveTab("performance");
+    setHasAppliedAudiences(true);
   };
 
   const generateMockAudiences = (formData: any): Audience[] => {
@@ -102,7 +108,7 @@ const TargetingDashboard = () => {
                 <Users className="h-4 w-4" />
                 <span>Audience Insights</span>
               </TabsTrigger>
-              <TabsTrigger value="performance" disabled={audiences.length === 0} className="flex items-center gap-2">
+              <TabsTrigger value="performance" disabled={!hasAppliedAudiences} className="flex items-center gap-2">
                 <LineChart className="h-4 w-4" />
                 <span>Performance</span>
               </TabsTrigger>
@@ -123,7 +129,7 @@ const TargetingDashboard = () => {
           </TabsContent>
           
           <TabsContent value="insights" className="p-6">
-            {audiences.length > 0 && <AudienceInsights audiences={audiences} />}
+            {audiences.length > 0 && <AudienceInsights audiences={audiences} onApplyAudiences={handleApplyAudiences} />}
             {audiences.length === 0 && (
               <Card>
                 <CardContent className="py-10">
@@ -136,14 +142,61 @@ const TargetingDashboard = () => {
           </TabsContent>
           
           <TabsContent value="performance" className="p-6">
-            <Card>
+            <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Campaign Performance Projections</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-500 text-center py-10">
-                  Performance projections will be available after running your campaign with the selected audiences.
-                </p>
+                {!hasAppliedAudiences ? (
+                  <p className="text-gray-500 text-center py-10">
+                    Performance projections will be available after running your campaign with the selected audiences.
+                  </p>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gradient-to-br from-brand-blue/10 to-brand-teal/10 p-4 rounded-lg">
+                        <p className="text-gray-500 text-sm">Expected CTR</p>
+                        <p className="text-2xl font-bold text-gray-900">3.8%</p>
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <span>+0.7%</span>
+                          <span>vs. industry average</span>
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-brand-blue/10 to-brand-teal/10 p-4 rounded-lg">
+                        <p className="text-gray-500 text-sm">Est. Conversion Rate</p>
+                        <p className="text-2xl font-bold text-gray-900">2.1%</p>
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <span>+0.4%</span>
+                          <span>vs. previous campaigns</span>
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-brand-blue/10 to-brand-teal/10 p-4 rounded-lg">
+                        <p className="text-gray-500 text-sm">Projected ROAS</p>
+                        <p className="text-2xl font-bold text-gray-900">3.7x</p>
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <span>+0.8x</span>
+                          <span>vs. previous campaigns</span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-3">AI Performance Insights</h3>
+                      <div className="bg-brand-lightblue border border-brand-blue/20 rounded-md p-4">
+                        <p className="text-sm text-gray-700">
+                          Based on your selected audience segments and historical campaign performance, 
+                          we project a significant improvement in key metrics. The Primary Target Segment 
+                          shows the highest potential for conversions, while the Secondary Target Segment 
+                          offers the best opportunity for expanded reach. We recommend allocating 60% of 
+                          your budget to the Primary segment, 30% to the Secondary segment, and 10% to 
+                          testing the Expansion Opportunity segment.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
